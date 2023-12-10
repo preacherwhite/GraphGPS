@@ -2,7 +2,7 @@ out_dir: results
 metric_best: mae
 metric_agg: argmin
 wandb:
-  use: True
+  use: False
   project: neural
 dataset:
   format: PyG-NeuroGraphDataset
@@ -25,7 +25,7 @@ posenc_RWSE:
   dim_pe: 16
   raw_norm_type: BatchNorm
 train:
-  mode: custom
+  mode: standard
   batch_size: 16
   eval_period: 1
   ckpt_period: 100

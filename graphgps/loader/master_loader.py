@@ -101,7 +101,7 @@ def load_dataset_master(format, name, dataset_dir):
         pyg_dataset_id = format.split('-', 1)[1]
         dataset_dir = osp.join(dataset_dir, pyg_dataset_id)
         if pyg_dataset_id == 'NeuroGraphDataset':
-            dataset = NeuroGraphDataset(dataset_dir, name)
+            dataset = preformat_NeuroGraphDataset(NeuroGraphDataset(dataset_dir, name))
         elif pyg_dataset_id == 'Actor':
             if name != 'none':
                 raise ValueError(f"Actor class provides only one dataset.")
@@ -318,7 +318,28 @@ def preformat_MalNetTiny(dataset_dir, feature_set):
 
     return dataset
 
+def preformat_NeuroGraphDataset(dataset):
+    """
+    Preprocess the NeuroGraphDataset to add edge features. This function creates edge features
+    based on the node features of the nodes connected by each edge.
 
+    Args:
+    dataset (torch_geometric.data.Dataset): The NeuroGraphDataset instance.
+
+    Returns:
+    torch_geometric.data.Dataset: The preprocessed dataset with edge features added.
+    """
+    for data in dataset:
+        # Ensure the dataset has node features
+        if data.x is None:
+            raise ValueError("Dataset does not have node features, which are required to create edge features.")
+
+        # Create edge features
+        # Here, we use the average of node features for the nodes connected by each edge
+        edge_features = (data.x[data.edge_index[0]] + data.x[data.edge_index[1]]) / 2
+        data.edge_attr = edge_features
+
+    return dataset
 def preformat_OGB_Graph(dataset_dir, name):
     """Load and preformat OGB Graph Property Prediction datasets.
 
