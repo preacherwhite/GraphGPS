@@ -38,10 +38,6 @@ def pre_transform_NeuroGraphDataset(data):
     Returns:
     torch_geometric.data.Data: The transformed Data object with edge features added.
     """
-    # Ensure the Data object has node features
-    if data.x is None:
-        raise ValueError("Data object does not have node features, which are required to create edge features.")
-
     # Create edge features by averaging the features of the nodes connected by each edge
     edge_features = (data.x[data.edge_index[0]] + data.x[data.edge_index[1]]) / 2
     data.edge_attr = edge_features
@@ -123,7 +119,7 @@ def load_dataset_master(format, name, dataset_dir):
         pyg_dataset_id = format.split('-', 1)[1]
         dataset_dir = osp.join(dataset_dir, pyg_dataset_id)
         if pyg_dataset_id == 'NeuroGraphDataset':
-            dataset = NeuroGraphDataset(dataset_dir, name, pre_transform=pre_transform_NeuroGraphDataset)
+            dataset = NeuroGraphDataset(dataset_dir, name, transform=pre_transform_NeuroGraphDataset)
         elif pyg_dataset_id == 'Actor':
             if name != 'none':
                 raise ValueError(f"Actor class provides only one dataset.")
