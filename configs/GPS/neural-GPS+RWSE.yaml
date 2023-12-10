@@ -14,7 +14,7 @@ dataset:
   node_encoder_name: RWSE
   node_encoder_bn: False
   edge_encoder: True
-  edge_encoder_name: LinearEdge
+  edge_encoder_name: VOCEdge
   edge_encoder_bn: False
   split_mode: random
 posenc_RWSE:
