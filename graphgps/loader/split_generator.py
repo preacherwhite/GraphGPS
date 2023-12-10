@@ -193,8 +193,8 @@ def set_dataset_splits(dataset, splits):
         split_names = [
             'train_graph_index', 'val_graph_index', 'test_graph_index'
         ]
-        # if splits[0].dtype == np.int32:
-        #     splits = [s.astype(np.int64) for s in splits]
+        if splits[0].dtype == np.int32:
+            splits = [s.astype(np.int64) for s in splits]
         for split_name, split_index in zip(split_names, splits):
             set_dataset_attr(dataset, split_name, split_index, len(split_index))
 

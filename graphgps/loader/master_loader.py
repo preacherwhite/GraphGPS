@@ -39,7 +39,8 @@ def pre_transform_NeuroGraphDataset(data):
     torch_geometric.data.Data: The transformed Data object with edge features added.
     """
     # Create edge features by averaging the features of the nodes connected by each edge
-    edge_features = (data.x[data.edge_index[0]] + data.x[data.edge_index[1]]) / 2
+    #edge_features = (data.x[data.edge_index[0]] + data.x[data.edge_index[1]]) / 2
+    edge_features = np.ones_like(data.edge_index[0, :], dtype=np.int64)
     data.edge_attr = edge_features
 
     return data
