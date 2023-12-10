@@ -40,8 +40,13 @@ def pre_transform_NeuroGraphDataset(data):
     """
     # Create edge features by averaging the features of the nodes connected by each edge
     #edge_features = (data.x[data.edge_index[0]] + data.x[data.edge_index[1]]) / 2
-    edge_features = torch.tensor(np.ones_like(data.edge_index[0, :], dtype=np.float32))
-    data.edge_attr = edge_features
+    edge_features = []
+    for i, j in data.edge_index.t():
+        x1, x2 = data.x[i], data.x[j]
+        corr = np.corrcoef(x1.detach().numpy(), x2.detach().numpy())[0, 1]
+        edge_features.append(corr)
+
+    data.edge_attr = torch.tensor(edge_features, dtype=torch.float).unsqueeze(1)
 
     return data
 
@@ -120,7 +125,7 @@ def load_dataset_master(format, name, dataset_dir):
         pyg_dataset_id = format.split('-', 1)[1]
         dataset_dir = osp.join(dataset_dir, pyg_dataset_id)
         if pyg_dataset_id == 'NeuroGraphDataset':
-            dataset = NeuroGraphDataset(dataset_dir, name, transform=pre_transform_NeuroGraphDataset)
+            dataset = NeuroGraphDataset(dataset_dir, name, pre_transform=pre_transform_NeuroGraphDataset)
         elif pyg_dataset_id == 'Actor':
             if name != 'none':
                 raise ValueError(f"Actor class provides only one dataset.")
