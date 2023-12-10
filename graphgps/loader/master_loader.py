@@ -28,7 +28,6 @@ from graphgps.transform.transforms import (pre_transform_in_memory,
 
 
 def pre_transform_NeuroGraphDataset_vectorized(data):
-
     node_features_1 = data.x[data.edge_index[0]]
     node_features_2 = data.x[data.edge_index[1]]
 
@@ -39,7 +38,13 @@ def pre_transform_NeuroGraphDataset_vectorized(data):
 
     correlation = (node_features_1 * node_features_2).sum(dim=1) / (node_features_1.size(1) - 1)
 
-    return correlation
+    data.edge_attr = correlation
+    return data
+
+
+def pre_transform_NeuroGraphDataset_one(data):
+    data.edge_attr = torch.Tensor(np.ones_like(data.edge_index[0, :]))
+    return data
 
 
 def log_loaded_dataset(dataset, format, name):
@@ -116,7 +121,7 @@ def load_dataset_master(format, name, dataset_dir):
         pyg_dataset_id = format.split('-', 1)[1]
         dataset_dir = osp.join(dataset_dir, pyg_dataset_id)
         if pyg_dataset_id == 'NeuroGraphDataset':
-            dataset = NeuroGraphDataset(dataset_dir, name, pre_transform=pre_transform_NeuroGraphDataset_vectorized)
+            dataset = NeuroGraphDataset(dataset_dir, name, transform=pre_transform_NeuroGraphDataset_one)
         elif pyg_dataset_id == 'Actor':
             if name != 'none':
                 raise ValueError(f"Actor class provides only one dataset.")
