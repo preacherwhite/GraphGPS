@@ -193,6 +193,7 @@ def set_dataset_splits(dataset, splits):
         split_names = [
             'train_graph_index', 'val_graph_index', 'test_graph_index'
         ]
+        print(splits)
         for split_name, split_index in zip(split_names, splits):
             set_dataset_attr(dataset, split_name, split_index, len(split_index))
 
