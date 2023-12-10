@@ -18,6 +18,7 @@ dataset:
   edge_encoder_name: TypeDictEdge
   edge_encoder_num_types: 4
   edge_encoder_bn: False
+  split_mode: random
 posenc_RWSE:
   enable: True
   kernel:
