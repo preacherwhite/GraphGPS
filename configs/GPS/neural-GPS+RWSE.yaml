@@ -2,7 +2,7 @@ out_dir: results
 metric_best: mae
 metric_agg: argmin
 wandb:
-  use: False
+  use: True
   project: neural
 dataset:
   format: PyG-NeuroGraphDataset
@@ -11,12 +11,10 @@ dataset:
   task_type: classification
   transductive: False
   node_encoder: True
-  node_encoder_name: TypeDictNode+RWSE
-  node_encoder_num_types: 28
+  node_encoder_name: RWSE
   node_encoder_bn: False
   edge_encoder: True
-  edge_encoder_name: TypeDictEdge
-  edge_encoder_num_types: 4
+  edge_encoder_name: LinearEdge
   edge_encoder_bn: False
   split_mode: random
 posenc_RWSE:
@@ -27,13 +25,13 @@ posenc_RWSE:
   dim_pe: 28
   raw_norm_type: BatchNorm
 train:
-  mode: standard
+  mode: custom
   batch_size: 32
   eval_period: 1
   ckpt_period: 100
 model:
   type: GPSModel
-  loss_fun: l1
+  loss_fun: cross_entropy
   edge_decoding: dot
   graph_pooling: add
 gt:
