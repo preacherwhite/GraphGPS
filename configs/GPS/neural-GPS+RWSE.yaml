@@ -6,9 +6,9 @@ wandb:
   project: neural
 dataset:
   format: PyG-NeuroGraphDataset
-  name: HCPFI
+  name: HCPGender
   task: graph
-  task_type: regression
+  task_type: classification
   transductive: False
   node_encoder: True
   node_encoder_name: TypeDictNode+RWSE
