@@ -5,8 +5,8 @@ wandb:
   use: False
   project: neural
 dataset:
-  format: PyG
-  name: NeuroGraphDataset
+  format: PyG-NeuroGraphDataset
+  name: HCPFI
   task: graph
   task_type: regression
   transductive: False
@@ -59,6 +59,6 @@ optim:
   optimizer: adamW
   weight_decay: 1e-5
   base_lr: 0.001
-  max_epoch: 2000
+  max_epoch: 100
   scheduler: cosine_with_warmup
   num_warmup_epochs: 50

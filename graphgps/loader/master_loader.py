@@ -9,7 +9,7 @@ import torch_geometric.transforms as T
 from numpy.random import default_rng
 from ogb.graphproppred import PygGraphPropPredDataset
 from torch_geometric.datasets import (Actor, GNNBenchmarkDataset, Planetoid,
-                                      TUDataset, WebKB, WikipediaNetwork, ZINC)
+                                      TUDataset, WebKB, WikipediaNetwork, ZINC,NeuroGraphDataset)
 from torch_geometric.graphgym.config import cfg
 from torch_geometric.graphgym.loader import load_pyg, load_ogb, set_dataset_attr
 from torch_geometric.graphgym.register import register_loader
@@ -100,8 +100,9 @@ def load_dataset_master(format, name, dataset_dir):
     if format.startswith('PyG-'):
         pyg_dataset_id = format.split('-', 1)[1]
         dataset_dir = osp.join(dataset_dir, pyg_dataset_id)
-
-        if pyg_dataset_id == 'Actor':
+        if pyg_dataset_id == 'NeuroGraphDataset':
+            dataset = NeuroGraphDataset(dataset_dir, name)
+        elif pyg_dataset_id == 'Actor':
             if name != 'none':
                 raise ValueError(f"Actor class provides only one dataset.")
             dataset = Actor(dataset_dir)
