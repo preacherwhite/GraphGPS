@@ -9,7 +9,7 @@ import torch_geometric.transforms as T
 from numpy.random import default_rng
 from ogb.graphproppred import PygGraphPropPredDataset
 from torch_geometric.datasets import (Actor, GNNBenchmarkDataset, Planetoid,
-                                      TUDataset, WebKB, WikipediaNetwork, ZINC,NeuroGraphDataset)
+                                      TUDataset, WebKB, WikipediaNetwork, ZINC, NeuroGraphDataset)
 from torch_geometric.graphgym.config import cfg
 from torch_geometric.graphgym.loader import load_pyg, load_ogb, set_dataset_attr
 from torch_geometric.graphgym.register import register_loader
@@ -26,29 +26,20 @@ from graphgps.transform.transforms import (pre_transform_in_memory,
                                            typecast_x, concat_x_and_pos,
                                            clip_graphs_to_size)
 
-def pre_transform_NeuroGraphDataset(data):
-    """
-    Preprocess a single Data object from the NeuroGraphDataset to add edge features.
-    This function creates edge features based on the node features of the nodes
-    connected by each edge.
 
-    Args:
-    data (torch_geometric.data.Data): A single Data object from the NeuroGraphDataset.
+def pre_transform_NeuroGraphDataset_vectorized(data):
 
-    Returns:
-    torch_geometric.data.Data: The transformed Data object with edge features added.
-    """
-    # Create edge features by averaging the features of the nodes connected by each edge
-    #edge_features = (data.x[data.edge_index[0]] + data.x[data.edge_index[1]]) / 2
-    edge_features = []
-    for i, j in data.edge_index.t():
-        x1, x2 = data.x[i], data.x[j]
-        corr = np.corrcoef(x1.detach().numpy(), x2.detach().numpy())[0, 1]
-        edge_features.append(corr)
+    node_features_1 = data.x[data.edge_index[0]]
+    node_features_2 = data.x[data.edge_index[1]]
 
-    data.edge_attr = torch.tensor(edge_features, dtype=torch.float).unsqueeze(1)
+    node_features_1 = (node_features_1 - node_features_1.mean(dim=1, keepdim=True)) / node_features_1.std(dim=1,
+                                                                                                          keepdim=True)
+    node_features_2 = (node_features_2 - node_features_2.mean(dim=1, keepdim=True)) / node_features_2.std(dim=1,
+                                                                                                          keepdim=True)
 
-    return data
+    correlation = (node_features_1 * node_features_2).sum(dim=1) / (node_features_1.size(1) - 1)
+
+    return correlation
 
 
 def log_loaded_dataset(dataset, format, name):
@@ -125,7 +116,7 @@ def load_dataset_master(format, name, dataset_dir):
         pyg_dataset_id = format.split('-', 1)[1]
         dataset_dir = osp.join(dataset_dir, pyg_dataset_id)
         if pyg_dataset_id == 'NeuroGraphDataset':
-            dataset = NeuroGraphDataset(dataset_dir, name, pre_transform=pre_transform_NeuroGraphDataset)
+            dataset = NeuroGraphDataset(dataset_dir, name, pre_transform=pre_transform_NeuroGraphDataset_vectorized)
         elif pyg_dataset_id == 'Actor':
             if name != 'none':
                 raise ValueError(f"Actor class provides only one dataset.")
@@ -154,7 +145,7 @@ def load_dataset_master(format, name, dataset_dir):
 
         elif pyg_dataset_id == 'ZINC':
             dataset = preformat_ZINC(dataset_dir, name)
-            
+
         elif pyg_dataset_id == 'AQSOL':
             dataset = preformat_AQSOL(dataset_dir, name)
 
@@ -188,11 +179,13 @@ def load_dataset_master(format, name, dataset_dir):
         elif name.startswith('ogbl-'):
             # GraphGym default loader.
             dataset = load_ogb(name, dataset_dir)
+
             # OGB link prediction datasets are binary classification tasks,
             # however the default loader creates float labels => convert to int.
             def convert_to_int(ds, prop):
                 tmp = getattr(ds.data, prop).int()
                 set_dataset_attr(ds, prop, tmp, len(tmp))
+
             convert_to_int(dataset, 'train_edge_label')
             convert_to_int(dataset, 'val_edge_label')
             convert_to_int(dataset, 'test_edge_label')
@@ -301,7 +294,7 @@ def preformat_GNNBenchmarkDataset(dataset_dir, name):
     if name in ['MNIST', 'CIFAR10', 'PATTERN', 'CLUSTER']:
         dataset = join_dataset_splits(
             [GNNBenchmarkDataset(root=dataset_dir, name=name, split=split)
-            for split in ['train', 'val', 'test']]
+             for split in ['train', 'val', 'test']]
         )
         pre_transform_in_memory(dataset, T.Compose(tf_list))
     elif name == 'CSL':
@@ -341,6 +334,8 @@ def preformat_MalNetTiny(dataset_dir, feature_set):
                           split_dict['test']]
 
     return dataset
+
+
 def preformat_OGB_Graph(dataset_dir, name):
     """Load and preformat OGB Graph Property Prediction datasets.
 
@@ -362,6 +357,7 @@ def preformat_OGB_Graph(dataset_dir, name):
         def add_zeros(data):
             data.x = torch.zeros(data.num_nodes, dtype=torch.long)
             return data
+
         dataset.transform = add_zeros
     elif name == 'ogbg-code2':
         from graphgps.loader.ogbg_code2_utils import idx2vocab, \
@@ -371,7 +367,7 @@ def preformat_OGB_Graph(dataset_dir, name):
 
         seq_len_list = np.array([len(seq) for seq in dataset.data.y])
         logging.info(f"Target sequences less or equal to {max_seq_len} is "
-            f"{np.sum(seq_len_list <= max_seq_len) / len(seq_len_list)}")
+                     f"{np.sum(seq_len_list <= max_seq_len) / len(seq_len_list)}")
 
         # Building vocabulary for sequence prediction. Only use training data.
         vocab2idx, idx2vocab_local = get_vocab_mapping(
@@ -419,7 +415,6 @@ def preformat_OGB_PCQM4Mv2(dataset_dir, name):
         logging.error('ERROR: Failed to import PygPCQM4Mv2Dataset, '
                       'make sure RDKit is installed.')
         raise e
-
 
     dataset = PygPCQM4Mv2Dataset(root=dataset_dir)
     split_idx = dataset.get_idx_split()
@@ -469,9 +464,9 @@ def preformat_OGB_PCQM4Mv2(dataset_dir, name):
                       list(range(n1, n1 + n2)),
                       list(range(n1 + n2, n1 + n2 + n3))]
         # Check prediction targets.
-        assert(all([not torch.isnan(dataset[i].y)[0] for i in split_idxs[0]]))
-        assert(all([torch.isnan(dataset[i].y)[0] for i in split_idxs[1]]))
-        assert(all([torch.isnan(dataset[i].y)[0] for i in split_idxs[2]]))
+        assert (all([not torch.isnan(dataset[i].y)[0] for i in split_idxs[0]]))
+        assert (all([torch.isnan(dataset[i].y)[0] for i in split_idxs[1]]))
+        assert (all([torch.isnan(dataset[i].y)[0] for i in split_idxs[2]]))
 
     else:
         raise ValueError(f'Unexpected OGB PCQM4Mv2 subset choice: {name}')
