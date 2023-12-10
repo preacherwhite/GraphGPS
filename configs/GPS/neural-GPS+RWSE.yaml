@@ -2,6 +2,8 @@ out_dir: results
 metric_best: mae
 metric_agg: argmin
 num_workers: 32
+tensorboard_each_run: True
+devices : 4
 wandb:
   use: True
   project: neural
@@ -26,8 +28,8 @@ posenc_RWSE:
   dim_pe: 16
   raw_norm_type: BatchNorm
 train:
-  mode: standard
-  batch_size: 16
+  mode: custom
+  batch_size: 32
   eval_period: 1
   ckpt_period: 100
 model:
@@ -59,6 +61,6 @@ optim:
   optimizer: adamW
   weight_decay: 1e-5
   base_lr: 0.001
-  max_epoch: 100
+  max_epoch: 10
   scheduler: cosine_with_warmup
-  num_warmup_epochs: 5
+  num_warmup_epochs: 2
