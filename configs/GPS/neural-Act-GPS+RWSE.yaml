@@ -28,7 +28,7 @@ posenc_RWSE:
   dim_pe: 16
   raw_norm_type: BatchNorm
 train:
-  mode: custom
+  mode: standard
   batch_size: 16
   eval_period: 1
   ckpt_period: 100
