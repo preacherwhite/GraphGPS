@@ -1,6 +1,7 @@
 out_dir: results
 metric_best: accuracy
 metric_agg: argmax
+num_workers: 35
 tensorboard_each_run: True
 devices : 1
 wandb:
