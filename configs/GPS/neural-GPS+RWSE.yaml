@@ -1,6 +1,6 @@
 out_dir: results
 metric_best: accuracy
-metric_agg: argmin
+metric_agg: argmax
 num_workers: 32
 tensorboard_each_run: True
 devices : 4
@@ -61,6 +61,6 @@ optim:
   optimizer: adamW
   weight_decay: 1e-5
   base_lr: 0.001
-  max_epoch: 10
+  max_epoch: 50
   scheduler: cosine_with_warmup
-  num_warmup_epochs: 2
+  num_warmup_epochs: 5
