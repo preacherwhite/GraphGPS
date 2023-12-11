@@ -9,7 +9,7 @@ wandb:
   project: neural
 dataset:
   format: PyG-NeuroGraphDataset
-  name: HCPAge
+  name: HCPActivity
   task: graph
   task_type: classification
   transductive: False
