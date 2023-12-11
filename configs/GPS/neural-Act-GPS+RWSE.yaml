@@ -1,9 +1,8 @@
 out_dir: results
 metric_best: accuracy
 metric_agg: argmax
-num_workers: 32
 tensorboard_each_run: True
-devices : 4
+devices : 1
 wandb:
   use: True
   project: neural
