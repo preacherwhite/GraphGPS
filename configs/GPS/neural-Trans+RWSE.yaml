@@ -38,7 +38,7 @@ model:
   edge_decoding: dot
   graph_pooling: mean
 gt:  # Hyperparameters optimized for ~100k budget.
-  layer_type: Transformer
+  layer_type: None+Transformer
   layers: 10
   n_heads: 4
   dim_hidden: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
