@@ -115,6 +115,7 @@ def run_loop_settings():
 if __name__ == '__main__':
     # Load cmd line args
     args = parse_args()
+    args.repeat = 3
     # Load config file
     set_cfg(cfg)
     load_cfg(cfg, args)
