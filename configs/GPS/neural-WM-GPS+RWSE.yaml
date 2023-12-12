@@ -23,7 +23,7 @@ posenc_RWSE:
   kernel:
     times_func: range(1,17)
   model: Linear
-  dim_pe: 28
+  dim_pe: 20
   raw_norm_type: BatchNorm
 train:
   mode: custom
@@ -35,10 +35,10 @@ model:
   loss_fun: l1
   graph_pooling: mean
 gt:
-  layer_type: CustomGatedGCN+Transformer  # CustomGatedGCN+Performer
-  layers: 5
+  layer_type: GINE+Transformer  # CustomGatedGCN+Performer
+  layers: 10
   n_heads: 4
-  dim_hidden: 128  # `gt.dim_hidden` must match `gnn.dim_inner`
+  dim_hidden: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
   dropout: 0.0
   attn_dropout: 0.5
   layer_norm: False
@@ -47,7 +47,7 @@ gnn:
   head: san_graph
   layers_pre_mp: 0
   layers_post_mp: 3  # Not used when `gnn.head: san_graph`
-  dim_inner: 128  # `gt.dim_hidden` must match `gnn.dim_inner`
+  dim_inner: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
   batchnorm: False
   act: relu
   dropout: 0.0
