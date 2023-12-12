@@ -1,6 +1,7 @@
 out_dir: results
 metric_best: mae
 metric_agg: argmin
+devices : 4
 wandb:
   use: True
   project: neural
