@@ -22,10 +22,10 @@ pip install wandb
 
 python main.py --cfg configs/GPS/neural-<ALTERNATIVE_DATASET>-<GPS/Trans>+RWSE.yaml  wandb.use False
 
-replace <ALTERNATIVE_DATASET> with either Act/FI/WM
-replace <GPS/Trans> with GPS/Trans for using full GPS model or only transformers
 ```
 
+replace <ALTERNATIVE_DATASET> with either Act/FI/WM
+replace <GPS/Trans> with GPS/Trans for using full GPS model or only transformers
 
 ## Unit tests (test if environment works)
 
